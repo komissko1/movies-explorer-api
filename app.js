@@ -1,20 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
 
 require('dotenv').config();
 
-const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const { limiter } = require('./middlewares/rateLimiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { login } = require('./controllers/login');
-const { createUser } = require('./controllers/createUser');
-const { auth } = require('./middlewares/auth');
 const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 app.use(cookieParser());
+app.use(helmet());
+app.use(limiter);
 
 app.use(cors({
   origin: 'http://localhost:3001',
@@ -44,7 +45,7 @@ app.use((req, res, next) => {
   return next();
 });
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect('mongodb://localhost:27017/moviesdb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -58,23 +59,7 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-  }),
-}), login);
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().alphanum().min(2).max(30),
-    about: Joi.string().alphanum().min(2).max(30),
-    avatar: Joi.string().pattern(/^(https?:\/\/)(www\.)?([\da-z-]+)\.([\da-z]{2,3})([\S]+)?/mi),
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-  }),
-}), createUser);
-app.use('/users', auth, require('./routes/users'));
-app.use('/cards', auth, require('./routes/cards'));
+app.use('/', require('./routes/index'));
 
 app.use((req, res, next) => {
   next(new NotFoundError('Ошибочный путь'));
