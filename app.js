@@ -11,7 +11,7 @@ const { limiter } = require('./middlewares/rateLimiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/NotFoundError');
 
-const { PORT = 3000, NODE_ENV, DB_ADRESS } = process.env;
+const { PORT = 3002, NODE_ENV, DB_ADRESS } = process.env;
 const app = express();
 app.use(cookieParser());
 app.use(helmet());
