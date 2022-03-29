@@ -24,9 +24,9 @@ app.use(cors({
 
 const allowedCors = [
   'https://movies-explorer.kkom.nomoredomains.work',
-  'http://localhost:3001',
+  'http://localhost:3003',
   'https://api.movies-explorer.kkom.nomoredomains.work',
-  'http://localhost:3000',
+  'http://localhost:3002',
 ];
 
 app.use((req, res, next) => {
