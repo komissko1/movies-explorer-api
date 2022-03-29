@@ -11,21 +11,21 @@ const { limiter } = require('./middlewares/rateLimiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/NotFoundError');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, NODE_ENV, DB_ADRESS } = process.env;
 const app = express();
 app.use(cookieParser());
 app.use(helmet());
 app.use(limiter);
 
 app.use(cors({
-  origin: 'http://localhost:3001',
+  origin: 'https://movies-explorer.kkom.nomoredomains.work',
   credentials: true,
 }));
 
 const allowedCors = [
-  'https://mesto-komisarov.students.nomoredomains.work',
+  'https://movies-explorer.kkom.nomoredomains.work',
   'http://localhost:3001',
-  'https://mesto-komisarov.nomoredomains.work',
+  'https://api.movies-explorer.kkom.nomoredomains.work',
   'http://localhost:3000',
 ];
 
@@ -45,7 +45,7 @@ app.use((req, res, next) => {
   return next();
 });
 
-mongoose.connect('mongodb://localhost:27017/moviesdb', {
+mongoose.connect(NODE_ENV === 'production' ? DB_ADRESS : 'mongodb://localhost:27017/moviesdb-dev', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
