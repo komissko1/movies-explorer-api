@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
     select: false,
     validate: {
       validator(v) {
-        const regex = /\w/gi;
+        const regex = /[\w!@#&()$"{%}:;',?*~$^+=<>]/gi;
         return regex.test(v);
       },
       message: 'Значение должно состоять из латинских символов и цифр',
