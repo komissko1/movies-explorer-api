@@ -9,12 +9,12 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const { limiter } = require('./middlewares/rateLimiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3002, NODE_ENV, DB_ADRESS } = process.env;
 const app = express();
 app.use(cookieParser());
 app.use(helmet());
+app.use(requestLogger);
 app.use(limiter);
 
 app.use(cors({
@@ -45,13 +45,12 @@ app.use((req, res, next) => {
   return next();
 });
 
-mongoose.connect(NODE_ENV === 'production' ? DB_ADRESS : 'mongodb://localhost:27017/moviesdb-dev', {
+mongoose.connect(NODE_ENV === 'production' ? DB_ADRESS : 'mongodb://localhost:27017/moviesdb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 app.use(express.json());
-app.use(requestLogger);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -61,9 +60,6 @@ app.get('/crash-test', () => {
 
 app.use('/', require('./routes/index'));
 
-app.use((req, res, next) => {
-  next(new NotFoundError('Ошибочный путь'));
-});
 app.use(errorLogger);
 app.use(errors());
 app.use((err, req, res, next) => {

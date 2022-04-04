@@ -6,16 +6,9 @@ const AuthorizationError = require('../errors/AuthorizationError');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
+    required: true,
     minlength: 2,
     maxlength: 30,
-    validate: {
-      validator(v) {
-        const regex = /[\wа-я\sё]/gi;
-        return regex.test(v);
-      },
-      message: 'Значение должно состоять из символов',
-    },
-    default: 'John Doe',
   },
   email: {
     type: String,
@@ -45,14 +38,14 @@ const userSchema = new mongoose.Schema({
 userSchema.statics.findUserByLoginData = function ({ email, password }) {
   return this.findOne({ email }).select('+password').then((user) => {
     if (!user) {
-      return Promise.reject(new AuthorizationError('Пользователь не найден'));
+      return Promise.reject(new AuthorizationError('Неправильная почта или пароль'));
     }
     return bcrypt.compare(password, user.password)
       .then((matched) => {
         if (!matched) {
-          return Promise.reject(new AuthorizationError('Пользователь не авторизован'));
+          return Promise.reject(new AuthorizationError('Неправильная почта или пароль'));
         }
-        return user;
+        return user.email;
       });
   });
 };
