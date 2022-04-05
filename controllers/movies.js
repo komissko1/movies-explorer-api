@@ -37,7 +37,6 @@ module.exports.createMovie = (req, res, next) => {
     movieId,
     owner: req.user._id,
   })
-    .then((movie) => movie.populate('owner'))
     .then((movie) => res.status(201).send(movie))
     .catch(next);
 };
@@ -46,7 +45,7 @@ module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(req.params._id)
     .orFail(() => new NotFoundError('Такого фильма не существует'))
     .then((movie) => {
-      if (JSON.stringify(movie.owner._id) !== JSON.stringify(req.user._id)) {
+      if (movie.owner._id.toString() !== req.user._id.toString()) {
         return next(new CardOwnerError('Нельзя удалить чужую карточку'));
       }
       return movie.remove().then(() => res.send({ message: 'Объект удален' }));

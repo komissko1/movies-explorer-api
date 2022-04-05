@@ -45,7 +45,9 @@ userSchema.statics.findUserByLoginData = function ({ email, password }) {
         if (!matched) {
           return Promise.reject(new AuthorizationError('Неправильная почта или пароль'));
         }
-        return user.email;
+        const newUser = user.toObject();
+        delete newUser.password;
+        return newUser;
       });
   });
 };

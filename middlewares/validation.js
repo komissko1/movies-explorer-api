@@ -1,15 +1,36 @@
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
-const linkPattern = /^(https?:\/\/)(www\.)?([\da-z-]+)\.([\da-z]{2,3})([\S]+)?/mi;
+const valueCheck = (value, helpers) => {
+  if (validator.isURL(value)) {
+    return value;
+  }
+  return helpers.message('Значение поля должно быть ссылкой');
+};
 
-module.exports.validateUser = ({ name, email, password }) => celebrate({
+module.exports.validateSignup = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30)
-      .required(name),
-    email: Joi.string().email().required(email),
+    name: Joi.string().min(2).max(30).required(),
+    email: Joi.string().email().required(),
     password: Joi.string()
       .pattern(/[\w!@#&()$'{%}:;',?*~$^+=<>]/i)
-      .required(password),
+      .required(),
+  }),
+});
+
+module.exports.validateSignin = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string()
+      .pattern(/[\w!@#&()$'{%}:;',?*~$^+=<>]/i)
+      .required(),
+  }),
+});
+
+module.exports.validateUserUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    email: Joi.string().email().required(),
   }),
 });
 
@@ -20,11 +41,11 @@ module.exports.validateCardCreate = celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().pattern(linkPattern).required(),
-    trailerLink: Joi.string().pattern(linkPattern).required(),
+    image: Joi.string().required().custom(valueCheck),
+    trailerLink: Joi.string().required().custom(valueCheck),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-    thumbnail: Joi.string().pattern(linkPattern).required(),
+    thumbnail: Joi.string().required().custom(valueCheck),
     movieId: Joi.number().required(),
   }),
 });
