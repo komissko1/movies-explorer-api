@@ -5,10 +5,10 @@ const { logout } = require('../controllers/logout');
 const { createUser } = require('../controllers/createUser');
 const { auth } = require('../middlewares/auth');
 const NotFoundError = require('../errors/NotFoundError');
-const { validateSignup, validateSignin } = require('../middlewares/validation');
+const { validateUser } = require('../middlewares/validation');
 
-router.post('/signin', validateSignin, login);
-router.post('/signup', validateSignup, createUser);
+router.post('/signin', validateUser({ userName: 'optional', userEmail: 'required', userPassword: 'required' }), login);
+router.post('/signup', validateUser({ userName: 'required', userEmail: 'required', userPassword: 'required' }), createUser);
 
 router.use(auth);
 router.post('/signout', logout);

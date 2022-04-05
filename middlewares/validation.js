@@ -8,29 +8,13 @@ const valueCheck = (value, helpers) => {
   return helpers.message('Значение поля должно быть ссылкой');
 };
 
-module.exports.validateSignup = celebrate({
+module.exports.validateUser = ({ userName, userEmail, userPassword }) => celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    email: Joi.string().email().required(),
+    name: Joi.string().min(2).max(30).presence(userName),
+    email: Joi.string().email().presence(userEmail),
     password: Joi.string()
       .pattern(/[\w!@#&()$'{%}:;',?*~$^+=<>]/i)
-      .required(),
-  }),
-});
-
-module.exports.validateSignin = celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string()
-      .pattern(/[\w!@#&()$'{%}:;',?*~$^+=<>]/i)
-      .required(),
-  }),
-});
-
-module.exports.validateUserUpdate = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    email: Joi.string().email().required(),
+      .presence(userPassword),
   }),
 });
 
