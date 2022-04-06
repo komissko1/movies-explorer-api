@@ -45,7 +45,7 @@ app.use((req, res, next) => {
   return next();
 });
 
-mongoose.connect(NODE_ENV === 'production' ? DB_ADRESS : 'mongodb://localhost:27017/moviesdb', {
+mongoose.connect(NODE_ENV === 'production' ? DB_ADRESS : 'mongodb://localhost:27017/moviesdb-alt', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
