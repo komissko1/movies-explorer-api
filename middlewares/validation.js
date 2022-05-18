@@ -8,6 +8,10 @@ const valueCheck = (value, helpers) => {
   return helpers.message('Значение поля должно быть ссылкой');
 };
 
+const customJoi = Joi.defaults((schema) => schema.options({
+  allowUnknown: true,
+}));
+
 module.exports.validateUser = ({ userName, userEmail, userPassword }) => celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).presence(userName),
@@ -19,18 +23,17 @@ module.exports.validateUser = ({ userName, userEmail, userPassword }) => celebra
 });
 
 module.exports.validateCardCreate = celebrate({
-  body: Joi.object().keys({
-    country: Joi.string().required(),
+  body: customJoi.object().keys({
+    country: Joi.string().allow(null).required(),
     director: Joi.string().required(),
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().custom(valueCheck),
+    image: Joi.object().required(),
     trailerLink: Joi.string().required().custom(valueCheck),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-    thumbnail: Joi.string().required().custom(valueCheck),
-    movieId: Joi.number().required(),
+    id: Joi.number().required(),
   }),
 });
 

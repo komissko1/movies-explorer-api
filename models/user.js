@@ -27,29 +27,35 @@ const userSchema = new mongoose.Schema({
     select: false,
     validate: {
       validator(v) {
-        const regex = /[\w!@#&()$"{%}:;',?*~$^+=<>]/gi;
+        const regex = /[\w!@#&()$'{%}:;',?*~$^+=<>]/gi;
         return regex.test(v);
       },
-      message: 'Значение должно состоять из латинских символов, цифр и спецсимволов',
+      message:
+        'Значение должно состоять из латинских символов, цифр и спецсимволов',
     },
   },
 });
 
 userSchema.statics.findUserByLoginData = function ({ email, password }) {
-  return this.findOne({ email }).select('+password').then((user) => {
-    if (!user) {
-      return Promise.reject(new AuthorizationError('Неправильная почта или пароль'));
-    }
-    return bcrypt.compare(password, user.password)
-      .then((matched) => {
+  return this.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(
+          new AuthorizationError('Неправильная почта или пароль'),
+        );
+      }
+      return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return Promise.reject(new AuthorizationError('Неправильная почта или пароль'));
+          return Promise.reject(
+            new AuthorizationError('Неправильная почта или пароль'),
+          );
         }
         const newUser = user.toObject();
         delete newUser.password;
         return newUser;
       });
-  });
+    });
 };
 
 module.exports = mongoose.model('user', userSchema);
